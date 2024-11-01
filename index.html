@@ -3,101 +3,202 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Proyecto 2 - Machine Learning Models</title>
-    <!-- Bootstrap CSS -->
+    <title>Proyecto 2 - Machine Learning</title>
     <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
       rel="stylesheet"
     />
     <style>
-      body {
-        background-color: #4b5059;
-        color: #ffffff;
-        display: flex;
-        flex-direction: column;
-        min-height: 100vh;
+      body,
+      html {
+        height: 100%;
+        background-color: #000; /* Fondo negro para el body */
+        color: #ffffff; /* Texto en blanco para contraste */
+      }
+      .container-fluid {
+        height: calc(100% - 80px); /* Restando el espacio del header y footer */
       }
       header,
       footer {
-        text-align: center;
-        padding: 1.5rem;
+        background-color: #4f515c; /* Fondo para el encabezado y footer */
+        color: #ffffff; /* Texto en blanco para contraste */
       }
-      main {
-        flex: 1;
+      /* Fondo blanco para los contenedores internos */
+      .content-container {
+        background-color: #ffffff;
+        color: #000; /* Texto en negro para contraste dentro de los div */
       }
-      .container {
-        max-width: 600px;
-        margin-top: 2rem;
+      /* Asegura que los divs de Datos y Gráfica se ajusten dentro de "Patrones" */
+      .pattern-container {
+        display: flex;
+        height: 100%;
       }
-      a {
-        color: #ffffff;
-        text-decoration: none;
-      }
-      a:hover {
-        color: #adb5bd;
+      .pattern-container > .col-md-6 {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
       }
     </style>
   </head>
-  <body>
-    <!-- Header -->
-    <header>
-      <h1>Proyecto 2</h1>
-      <h3>Christian Alessander Blanco González</h3>
-      <h3>202000173</h3>
+  <body class="d-flex flex-column">
+    <!-- Encabezado -->
+    <header class="text-center py-3 border-bottom">
+      <h2>Proyecto 2 - Machine Learning</h2>
+      <p>Christian Alessander Blanco González - 202000173</p>
     </header>
 
-    <!-- Main Content -->
-    <main>
-      <div class="container">
-        <div class="list-group">
-          <a
-            href="./src/pages/linear_regresion.html"
-            class="list-group-item list-group-item-action bg-secondary text-white"
-            >Linear Regression</a
-          >
-          <a
-            href="./src/pages/polynomial_regression.html"
-            class="list-group-item list-group-item-action bg-secondary text-white"
-            >Polynomial Regression</a
-          >
-          <a
-            href="./src/pages/decision_tree.html"
-            class="list-group-item list-group-item-action bg-secondary text-white"
-            >Decision Tree</a
-          >
-          <a
-            href="./src/pages/naive_bayes.html"
-            class="list-group-item list-group-item-action bg-secondary text-white"
-            >Naive Bayes</a
-          >
-          <a
-            href="./src/pages/neural_network.html"
-            class="list-group-item list-group-item-action bg-secondary text-white"
-            >Neuronal Network</a
-          >
-          <a
-            href="./src/pages/kmeans.html"
-            class="list-group-item list-group-item-action bg-secondary text-white"
-            >KMeans</a
-          >
-          <a
-            href="./src/pages/knn.html"
-            class="list-group-item list-group-item-action bg-secondary text-white"
-            >K-Nearest Neighbor</a
-          >
+    <!-- Contenido principal -->
+    <div class="container-fluid my-3 flex-grow-1">
+      <div class="row h-100">
+        <!-- Columna de Parámetros y Entrenamiento -->
+        <div class="col-md-3 d-flex flex-column">
+          <!-- Parámetros -->
+          <div class="border p-3 mb-3 flex-grow-1 content-container">
+            <h5 class="text-center">Parámetros</h5>
+            <form>
+              <!-- Combo Box para seleccionar el modelo -->
+              <div class="mb-3">
+                <label for="modelSelect" class="form-label"
+                  >Seleccionar Modelo</label
+                >
+                <select
+                  class="form-select"
+                  id="modelSelect"
+                  onchange="updateParameters()"
+                >
+                  <option value="">Seleccione un modelo</option>
+                  <option value="linear_regression">Linear Regression</option>
+                  <option value="polynomial_regression">
+                    Polynomial Regression
+                  </option>
+                  <option value="decision_tree">Decision Tree</option>
+                  <option value="neural_network">Neuronal Network</option>
+                </select>
+              </div>
+
+              <!-- Contenedor de parámetros dinámicos -->
+              <div id="parameterContainer"></div>
+
+              <!-- Input para cargar archivos -->
+              <div class="mb-3">
+                <label for="fileUpload" class="form-label"
+                  >Cargar Archivo</label
+                >
+                <input class="form-control" type="file" id="fileUpload" />
+              </div>
+              <!-- Botón Procesar -->
+              <button type="button" class="btn btn-dark w-100">Procesar</button>
+            </form>
+          </div>
+
+          <!-- Entrenamiento -->
+          <div class="border p-3 flex-grow-1 content-container">
+            <h5 class="text-center">Entrenamiento</h5>
+          </div>
+        </div>
+
+        <!-- Columna de Predicciones y Tendencias -->
+        <div class="col-md-9 d-flex flex-column">
+          <div class="row mb-3 flex-grow-1">
+            <!-- Predicciones -->
+            <div class="col-md-6">
+              <div class="border p-3 h-100 content-container">
+                <h6 class="text-center">Predicciones</h6>
+                <div class="row mt-3 h-75">
+                  <div
+                    class="col-6 border text-center py-4 d-flex align-items-center justify-content-center"
+                  >
+                    Datos
+                  </div>
+                  <div
+                    class="col-6 border text-center py-4 d-flex align-items-center justify-content-center"
+                  >
+                    Gráfica
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- Tendencias -->
+            <div class="col-md-6">
+              <div class="border p-3 h-100 content-container">
+                <h6 class="text-center">Tendencias</h6>
+                <div class="row mt-3 h-75">
+                  <div
+                    class="col-6 border text-center py-4 d-flex align-items-center justify-content-center"
+                  >
+                    Datos
+                  </div>
+                  <div
+                    class="col-6 border text-center py-4 d-flex align-items-center justify-content-center"
+                  >
+                    Gráfica
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Patrones -->
+          <div class="border p-3 flex-grow-1 content-container">
+            <h6 class="text-center">Patrones</h6>
+            <div class="row mt-3 h-100 pattern-container">
+              <div class="col-md-6 border text-center py-4">Datos</div>
+              <div class="col-md-6 border text-center py-4">Gráfica</div>
+            </div>
+          </div>
         </div>
       </div>
-    </main>
+    </div>
 
     <!-- Footer -->
-    <footer>
-      <p>
-        &copy; 2024 Christian Alessander Blanco González. Todos los derechos
-        reservados.
-      </p>
+    <footer class="text-center py-3 border-top">
+      <p>&copy; 2024 Derechos Reservados</p>
     </footer>
 
-    <!-- Bootstrap JavaScript and dependencies -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+      function updateParameters() {
+        const modelSelect = document.getElementById("modelSelect");
+        const parameterContainer =
+          document.getElementById("parameterContainer");
+        parameterContainer.innerHTML = ""; // Limpiar el contenido anterior
+
+        // Crear elementos según el modelo seleccionado
+        if (modelSelect.value === "linear_regression") {
+          parameterContainer.innerHTML = `
+                    <div class="mb-3">
+                        <label for="rangeInput" class="form-label">Rango para Nueva Predicción (X)</label>
+                        <input type="number" class="form-control" id="rangeInput" placeholder="Ingrese el rango">
+                    </div>`;
+        } else if (modelSelect.value === "polynomial_regression") {
+          parameterContainer.innerHTML = `
+                    <div class="mb-3">
+                        <label for="degreeInput" class="form-label">Selecciona el grado de la Regresión Polinomial</label>
+                        <input type="number" class="form-control" id="degreeInput" placeholder="Ingrese el grado">
+                    </div>
+                    <div class="mb-3">
+                        <label for="rangeInput" class="form-label">Rango para Nueva Predicción (X)</label>
+                        <input type="number" class="form-control" id="rangeInput" placeholder="Ingrese el rango">
+                    </div>`;
+        } else if (modelSelect.value === "decision_tree") {
+          parameterContainer.innerHTML = `
+                    <div class="mb-3">
+                        <label for="rangeInput" class="form-label">Rango para Nueva Predicción (X)</label>
+                        <input type="number" class="form-control" id="rangeInput" placeholder="Ingrese el rango">
+                    </div>
+                    <div class="mb-3">
+                        <label for="predictInput" class="form-label">Predict</label>
+                        <input type="text" class="form-control" id="predictInput" placeholder="Ingrese el valor de predict">
+                    </div>`;
+        } else if (modelSelect.value === "neural_network") {
+          parameterContainer.innerHTML = `
+                    <div class="mb-3">
+                        <label for="rangeInput" class="form-label">Rango para Nueva Predicción (X)</label>
+                        <input type="number" class="form-control" id="rangeInput" placeholder="Ingrese el rango">
+                    </div>`;
+        }
+      }
+    </script>
   </body>
 </html>
