@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>K-Nearest Neighbor</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    />
+    <style>
+      :root {
+        --primary-color: #424654;
+        --secondary-color: #5a5f73;
+        --background-color: #f5f5f7;
+        --card-background: #ffffff;
+        --text-color: #333333;
+        --border-radius: 15px;
+        --box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+      }
+
+      body {
+        background-color: var(--background-color);
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        color: var(--text-color);
+        min-height: 100vh;
+        margin: 0;
+        padding: 0;
+      }
+
+      .header {
+        background: linear-gradient(
+          135deg,
+          var(--primary-color),
+          var(--secondary-color)
+        );
+        color: white;
+        padding: 2rem 0;
+        text-align: center;
+        margin-bottom: 2rem;
+        box-shadow: var(--box-shadow);
+      }
+
+      .header h1 {
+        font-size: 2.5rem;
+        margin: 0;
+        font-weight: 600;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+      }
+
+      .content-container {
+        background-color: var(--card-background);
+        border-radius: var(--border-radius);
+        box-shadow: var(--box-shadow);
+        padding: 2rem;
+        margin: 0 auto 2rem;
+        max-width: 1200px;
+        width: 90%;
+      }
+
+      .form-label {
+        color: var(--primary-color);
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+      }
+
+      .form-control {
+        border-radius: 8px;
+        border: 2px solid #e1e1e1;
+        padding: 0.75rem;
+        transition: all 0.3s ease;
+      }
+
+      .form-control:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 0.2rem rgba(66, 70, 84, 0.25);
+      }
+
+      .btn {
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      }
+
+      .btn-custom {
+        background: linear-gradient(
+          135deg,
+          var(--primary-color),
+          var(--secondary-color)
+        );
+        color: white;
+        border: none;
+      }
+
+      .btn-custom:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        background: linear-gradient(
+          135deg,
+          var(--secondary-color),
+          var(--primary-color)
+        );
+      }
+
+      .return-btn {
+        position: fixed;
+        top: 1.5rem;
+        left: 1.5rem;
+        background: var(--primary-color);
+        color: white;
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        box-shadow: var(--box-shadow);
+        z-index: 1000;
+      }
+
+      .return-btn:hover {
+        background: var(--secondary-color);
+        color: white;
+        transform: translateY(-2px);
+      }
+
+      #chart_div {
+        background-color: white;
+        border-radius: var(--border-radius);
+        box-shadow: var(--box-shadow);
+        padding: 1.5rem;
+      }
+
+      footer {
+        background-color: #424654;
+        color: white;
+        text-align: center;
+        padding: 15px;
+      }
+    </style>
+    <script src="../dist/tytus.js"></script>
+    <script
+      type="text/javascript"
+      src="https://www.gstatic.com/charts/loader.js"
+    ></script>
+  </head>
+  <body>
+    <a href="../../index.html" class="return-btn">
+      <i class="fas fa-arrow-left"></i> Volver
+    </a>
+
+    <div class="header">
+      <h1><i class="fas fa-project-diagram"></i> K-Nearest Neighbor</h1>
+    </div>
+
+    <div class="content-container">
+      <div class="mb-4">
+        <h3>Carga del archivo JSON:</h3>
+        <input
+          type="file"
+          id="jsonFileInput"
+          accept=".json"
+          class="form-control d-inline w-100"
+        />
+      </div>
+
+      <h3>Ingresar Punto de Evaluación</h3>
+      <div class="mb-4">
+        <input
+          type="text"
+          id="pointInput"
+          placeholder="Ejemplo: H 5 7 9"
+          class="form-control d-inline w-100"
+        />
+      </div>
+      <div class="card-body">
+        <div class="d-flex justify-content-between flex-wrap gap-3">
+          <button onclick="cargarDatosDesdeJSON()" class="btn btn-custom">
+            Entrenar
+          </button>
+          <button onclick="cargarPuntoDesdeTexto()" class="btn btn-custom">
+            Predecir
+          </button>
+        </div>
+      </div>
+
+      <h3>Training Data</h3>
+      <div id="tabla" class="table-responsive mb-4"></div>
+
+      <div id="log">
+        <h4><strong>Distancias</strong></h4>
+        <p><strong>Euclidean:</strong> <span id="logE"></span></p>
+        <p><strong>Manhattan:</strong> <span id="logM"></span></p>
+      </div>
+
+      <div
+        id="chart_div"
+        class="container mt-4"
+        style="width: 900px; height: 500px"
+      ></div>
+    </div>
+
+    <script>
+      let knn;
+      let ind = [],
+        x2 = [],
+        y2 = [],
+        z = [],
+        group = [];
+      let point = null;
+
+      function cargarDatosDesdeJSON() {
+        const fileInput = document.getElementById("jsonFileInput").files[0];
+        if (!fileInput)
+          return alert("Por favor selecciona un archivo JSON de datos.");
+
+        const reader = new FileReader();
+        reader.onload = function (event) {
+          alert("Datos cargados correctamente.");
+          const data = JSON.parse(event.target.result);
+
+          if (data.length !== 7 || data[0].length !== 5) {
+            alert(
+              "El archivo JSON debe contener exactamente 7 filas y 5 columnas en la estructura esperada."
+            );
+            return;
+          }
+
+          ind = data.map((row) => row[0]);
+          x2 = data.map((row) => row[1]);
+          y2 = data.map((row) => row[2]);
+          z = data.map((row) => row[3]);
+          group = data.map((row) => row[4]);
+
+          mostrarDatosEnTabla(data);
+          inicializarKNN();
+          drawChart();
+        };
+        reader.readAsText(fileInput);
+      }
+
+      function mostrarDatosEnTabla(data) {
+        let tablaHTML =
+          "<table class='table table-bordered'><thead><tr><th>Index</th><th>X</th><th>Y</th><th>Z</th><th>Group</th></tr></thead><tbody>";
+        data.forEach((fila) => {
+          tablaHTML += `<tr><td>${fila[0]}</td><td>${fila[1]}</td><td>${fila[2]}</td><td>${fila[3]}</td><td>${fila[4]}</td></tr>`;
+        });
+        tablaHTML += "</tbody></table>";
+        document.getElementById("tabla").innerHTML = tablaHTML;
+      }
+
+      function inicializarKNN() {
+        const individuals = x2.map((x, i) => [x, y2[i], z[i], group[i]]);
+        knn = new KNearestNeighbor(individuals);
+      }
+
+      function cargarPuntoDesdeTexto() {
+        const input = document.getElementById("pointInput").value.trim();
+        const partes = input.split(" ");
+
+        if (partes.length !== 4) {
+          alert("Por favor ingresa el punto en el formato correcto: ID X Y Z");
+          return;
+        }
+
+        // Extraer coordenadas y convertir a número
+        const x = parseFloat(partes[1]);
+        const y = parseFloat(partes[2]);
+        const zVal = parseFloat(partes[3]);
+
+        if (isNaN(x) || isNaN(y) || isNaN(zVal)) {
+          alert("Asegúrate de ingresar valores numéricos para X, Y y Z.");
+          return;
+        }
+
+        point = [x, y, zVal];
+        calcularDistancias();
+      }
+
+      function calcularDistancias() {
+        if (!knn || !point)
+          return alert(
+            "Primero carga los datos de entrenamiento y el punto de evaluación."
+          );
+
+        // Calcular distancias
+        const euc = knn.euclidean(point).join(", ");
+        const man = knn.manhattan(point).join(", ");
+        document.getElementById("logE").innerText = euc;
+        document.getElementById("logM").innerText = man;
+      }
+
+      // Cargar y dibujar el gráfico
+      google.charts.load("current", { packages: ["corechart"] });
+
+      function drawChart() {
+        if (x2.length === 0 || y2.length === 0 || group.length === 0) return;
+
+        const data = new google.visualization.DataTable();
+        data.addColumn("number", "X");
+        data.addColumn("number", "Y");
+        data.addColumn({ type: "string", role: "style" });
+        data.addColumn({ type: "string", role: "annotation" });
+
+        // Asigna colores y formas específicas según el grupo y añade las etiquetas
+        x2.forEach((x, i) => {
+          let color = "";
+          let shape = "";
+
+          switch (group[i]) {
+            case "I":
+              color = "red";
+              shape = "square";
+              break;
+            case "II":
+              color = "orange";
+              shape = "triangle";
+              break;
+            case "III":
+              color = "blue";
+              shape = "circle";
+              break;
+          }
+
+          data.addRow([
+            x,
+            y2[i],
+            `point {fill-color: ${color}; shape-type: ${shape};}`,
+            ind[i],
+          ]);
+        });
+
+        const options = {
+          legend: "none",
+          pointSize: 20,
+          hAxis: { title: "X" },
+          vAxis: { title: "Y" },
+          annotations: {
+            textStyle: {
+              fontSize: 12,
+              bold: true,
+            },
+          },
+        };
+
+        const chart = new google.visualization.ScatterChart(
+          document.getElementById("chart_div")
+        );
+        chart.draw(data, options);
+      }
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <footer>
+        <p>
+          &copy; 2024 Christian Alessander Blanco González. Todos los derechos
+          reservados.
+        </p>
+      </footer>
+  </body>
+</html>

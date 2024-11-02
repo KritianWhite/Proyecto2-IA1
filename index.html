@@ -3,202 +3,128 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Proyecto 2 - Machine Learning</title>
-    <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
-      rel="stylesheet"
-    />
+    <title>Proyecto 2 - IA</title>
     <style>
-      body,
-      html {
-        height: 100%;
-        background-color: #000; /* Fondo negro para el body */
-        color: #ffffff; /* Texto en blanco para contraste */
+      body {
+        margin: 0;
+        padding: 0;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        font-family: Arial, sans-serif;
       }
-      .container-fluid {
-        height: calc(100% - 80px); /* Restando el espacio del header y footer */
+
+      header {
+        background-color: #424654;
+        color: white;
+        padding: 20px;
+        text-align: center;
       }
-      header,
+
+      main {
+        flex: 1;
+        background-color: #f5f5f7;
+        padding: 40px;
+      }
+
       footer {
-        background-color: #4f515c; /* Fondo para el encabezado y footer */
-        color: #ffffff; /* Texto en blanco para contraste */
+        background-color: #424654;
+        color: white;
+        text-align: center;
+        padding: 15px;
       }
-      /* Fondo blanco para los contenedores internos */
-      .content-container {
-        background-color: #ffffff;
-        color: #000; /* Texto en negro para contraste dentro de los div */
+
+      .modelos-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
       }
-      /* Asegura que los divs de Datos y Gráfica se ajusten dentro de "Patrones" */
-      .pattern-container {
+
+      .modelo-btn {
+        background-color: white;
+        border: 2px solid #424654;
+        border-radius: 10px;
+        padding: 20px;
+        text-align: center;
+        text-decoration: none;
+        color: #424654;
+        font-size: 16px;
+        transition: all 0.3s ease;
+        cursor: pointer;
         display: flex;
-        height: 100%;
-      }
-      .pattern-container > .col-md-6 {
-        display: flex;
-        align-items: center;
+        flex-direction: column;
         justify-content: center;
-        height: 100%;
+        align-items: center;
+        min-height: 120px;
+      }
+
+      .modelo-btn:hover {
+        background-color: #424654;
+        color: white;
+        transform: translateY(-5px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      }
+
+      .modelo-btn i {
+        font-size: 24px;
+        margin-bottom: 10px;
+      }
+
+      h1 {
+        margin: 0;
+        font-size: 24px;
+      }
+
+      .autor {
+        margin-top: 10px;
+        font-size: 18px;
+      }
+
+      .icon {
+        font-size: 24px;
+        margin-bottom: 10px;
       }
     </style>
   </head>
-  <body class="d-flex flex-column">
-    <!-- Encabezado -->
-    <header class="text-center py-3 border-bottom">
-      <h2>Proyecto 2 - Machine Learning</h2>
-      <p>Christian Alessander Blanco González - 202000173</p>
+  <body>
+    <header>
+      <h1>Proyecto 2 - IA</h1>
+      <div class="autor">Christian Alessander Blanco González - 202000173</div>
     </header>
 
-    <!-- Contenido principal -->
-    <div class="container-fluid my-3 flex-grow-1">
-      <div class="row h-100">
-        <!-- Columna de Parámetros y Entrenamiento -->
-        <div class="col-md-3 d-flex flex-column">
-          <!-- Parámetros -->
-          <div class="border p-3 mb-3 flex-grow-1 content-container">
-            <h5 class="text-center">Parámetros</h5>
-            <form>
-              <!-- Combo Box para seleccionar el modelo -->
-              <div class="mb-3">
-                <label for="modelSelect" class="form-label"
-                  >Seleccionar Modelo</label
-                >
-                <select
-                  class="form-select"
-                  id="modelSelect"
-                  onchange="updateParameters()"
-                >
-                  <option value="">Seleccione un modelo</option>
-                  <option value="linear_regression">Linear Regression</option>
-                  <option value="polynomial_regression">
-                    Polynomial Regression
-                  </option>
-                  <option value="decision_tree">Decision Tree</option>
-                  <option value="neural_network">Neuronal Network</option>
-                </select>
-              </div>
-
-              <!-- Contenedor de parámetros dinámicos -->
-              <div id="parameterContainer"></div>
-
-              <!-- Input para cargar archivos -->
-              <div class="mb-3">
-                <label for="fileUpload" class="form-label"
-                  >Cargar Archivo</label
-                >
-                <input class="form-control" type="file" id="fileUpload" />
-              </div>
-              <!-- Botón Procesar -->
-              <button type="button" class="btn btn-dark w-100">Procesar</button>
-            </form>
-          </div>
-
-          <!-- Entrenamiento -->
-          <div class="border p-3 flex-grow-1 content-container">
-            <h5 class="text-center">Entrenamiento</h5>
-          </div>
-        </div>
-
-        <!-- Columna de Predicciones y Tendencias -->
-        <div class="col-md-9 d-flex flex-column">
-          <div class="row mb-3 flex-grow-1">
-            <!-- Predicciones -->
-            <div class="col-md-6">
-              <div class="border p-3 h-100 content-container">
-                <h6 class="text-center">Predicciones</h6>
-                <div class="row mt-3 h-75">
-                  <div
-                    class="col-6 border text-center py-4 d-flex align-items-center justify-content-center"
-                  >
-                    Datos
-                  </div>
-                  <div
-                    class="col-6 border text-center py-4 d-flex align-items-center justify-content-center"
-                  >
-                    Gráfica
-                  </div>
-                </div>
-              </div>
-            </div>
-            <!-- Tendencias -->
-            <div class="col-md-6">
-              <div class="border p-3 h-100 content-container">
-                <h6 class="text-center">Tendencias</h6>
-                <div class="row mt-3 h-75">
-                  <div
-                    class="col-6 border text-center py-4 d-flex align-items-center justify-content-center"
-                  >
-                    Datos
-                  </div>
-                  <div
-                    class="col-6 border text-center py-4 d-flex align-items-center justify-content-center"
-                  >
-                    Gráfica
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Patrones -->
-          <div class="border p-3 flex-grow-1 content-container">
-            <h6 class="text-center">Patrones</h6>
-            <div class="row mt-3 h-100 pattern-container">
-              <div class="col-md-6 border text-center py-4">Datos</div>
-              <div class="col-md-6 border text-center py-4">Gráfica</div>
-            </div>
-          </div>
-        </div>
+    <main>
+      <div class="modelos-grid">
+        <a href="./src/pages/linearRegression.html" class="modelo-btn">
+          <span class="icon">📈</span>
+          <span>Linear Regression</span>
+        </a>
+        <a href="./src/pages/polynomialRegression.html" class="modelo-btn">
+          <span class="icon">📊</span>
+          <span>Polynomial Regression</span>
+        </a>
+        <a href="./src/pages/decisionTree.html" class="modelo-btn">
+          <span class="icon">🌳</span>
+          <span>Decision Tree</span>
+        </a>
+        <a href="./src/pages/kmeans.html" class="modelo-btn">
+          <span class="icon">🎯</span>
+          <span>KMeans</span>
+        </a>
+        <a href="./src/pages/knn.html" class="modelo-btn">
+          <span class="icon">🔍</span>
+          <span>K-Nearest Neighbor</span>
+        </a>
       </div>
-    </div>
+    </main>
 
-    <!-- Footer -->
-    <footer class="text-center py-3 border-top">
-      <p>&copy; 2024 Derechos Reservados</p>
+    <footer>
+      <p>
+        &copy; 2024 Christian Alessander Blanco González. Todos los derechos
+        reservados.
+      </p>
     </footer>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-      function updateParameters() {
-        const modelSelect = document.getElementById("modelSelect");
-        const parameterContainer =
-          document.getElementById("parameterContainer");
-        parameterContainer.innerHTML = ""; // Limpiar el contenido anterior
-
-        // Crear elementos según el modelo seleccionado
-        if (modelSelect.value === "linear_regression") {
-          parameterContainer.innerHTML = `
-                    <div class="mb-3">
-                        <label for="rangeInput" class="form-label">Rango para Nueva Predicción (X)</label>
-                        <input type="number" class="form-control" id="rangeInput" placeholder="Ingrese el rango">
-                    </div>`;
-        } else if (modelSelect.value === "polynomial_regression") {
-          parameterContainer.innerHTML = `
-                    <div class="mb-3">
-                        <label for="degreeInput" class="form-label">Selecciona el grado de la Regresión Polinomial</label>
-                        <input type="number" class="form-control" id="degreeInput" placeholder="Ingrese el grado">
-                    </div>
-                    <div class="mb-3">
-                        <label for="rangeInput" class="form-label">Rango para Nueva Predicción (X)</label>
-                        <input type="number" class="form-control" id="rangeInput" placeholder="Ingrese el rango">
-                    </div>`;
-        } else if (modelSelect.value === "decision_tree") {
-          parameterContainer.innerHTML = `
-                    <div class="mb-3">
-                        <label for="rangeInput" class="form-label">Rango para Nueva Predicción (X)</label>
-                        <input type="number" class="form-control" id="rangeInput" placeholder="Ingrese el rango">
-                    </div>
-                    <div class="mb-3">
-                        <label for="predictInput" class="form-label">Predict</label>
-                        <input type="text" class="form-control" id="predictInput" placeholder="Ingrese el valor de predict">
-                    </div>`;
-        } else if (modelSelect.value === "neural_network") {
-          parameterContainer.innerHTML = `
-                    <div class="mb-3">
-                        <label for="rangeInput" class="form-label">Rango para Nueva Predicción (X)</label>
-                        <input type="number" class="form-control" id="rangeInput" placeholder="Ingrese el rango">
-                    </div>`;
-        }
-      }
-    </script>
   </body>
 </html>

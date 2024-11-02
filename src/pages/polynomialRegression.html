@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Regresión Polinomial</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    />
+    <style>
+      :root {
+        --primary-color: #424654;
+        --secondary-color: #5a5f73;
+        --background-color: #f5f5f7;
+        --card-background: #ffffff;
+        --text-color: #333333;
+        --border-radius: 15px;
+        --box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+      }
+
+      body {
+        background-color: var(--background-color);
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        color: var(--text-color);
+        min-height: 100vh;
+        margin: 0;
+        padding: 0;
+      }
+
+      .header {
+        background: linear-gradient(
+          135deg,
+          var(--primary-color),
+          var(--secondary-color)
+        );
+        color: white;
+        padding: 2rem 0;
+        text-align: center;
+        margin-bottom: 2rem;
+        box-shadow: var(--box-shadow);
+      }
+
+      .header h1 {
+        font-size: 2.5rem;
+        margin: 0;
+        font-weight: 600;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+      }
+
+      .content-container {
+        background-color: var(--card-background);
+        border-radius: var(--border-radius);
+        box-shadow: var(--box-shadow);
+        padding: 2rem;
+        margin: 0 auto 2rem;
+        max-width: 1200px;
+        width: 90%;
+      }
+
+      .form-label {
+        color: var(--primary-color);
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+      }
+
+      .form-control {
+        border-radius: 8px;
+        border: 2px solid #e1e1e1;
+        padding: 0.75rem;
+        transition: all 0.3s ease;
+      }
+
+      .form-control:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 0.2rem rgba(66, 70, 84, 0.25);
+      }
+
+      .btn {
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      }
+
+      .btn-custom {
+        background: linear-gradient(
+          135deg,
+          var(--primary-color),
+          var(--secondary-color)
+        );
+        color: white;
+        border: none;
+      }
+
+      .btn-custom:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        background: linear-gradient(
+          135deg,
+          var(--secondary-color),
+          var(--primary-color)
+        );
+      }
+
+      .btn-custom:disabled {
+        background: #cccccc;
+        cursor: not-allowed;
+      }
+
+      #log {
+        background-color: #f8f9fa;
+        padding: 1rem;
+        border-radius: var(--border-radius);
+        font-family: "Consolas", monospace;
+        margin-top: 1.5rem;
+        border: 1px solid #e1e1e1;
+        max-height: 300px;
+        overflow-y: auto;
+        white-space: pre-wrap;
+      }
+
+      #graphContainer {
+        background-color: white;
+        border-radius: var(--border-radius);
+        padding: 1.5rem;
+        box-shadow: var(--box-shadow);
+        margin: 2rem auto;
+        min-height: 500px;
+      }
+
+      .return-btn {
+        position: fixed;
+        top: 1.5rem;
+        left: 1.5rem;
+        background: var(--primary-color);
+        color: white;
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        box-shadow: var(--box-shadow);
+        z-index: 1000;
+      }
+
+      .return-btn:hover {
+        background: var(--secondary-color);
+        color: white;
+        transform: translateY(-2px);
+      }
+
+      footer {
+        background-color: #424654;
+        color: white;
+        text-align: center;
+        padding: 15px;
+      }
+    </style>
+    <script src="../dist/tytus.js"></script>
+    <script
+      type="text/javascript"
+      src="https://www.gstatic.com/charts/loader.js"
+    ></script>
+  </head>
+  <body>
+    <a href="../../index.html" class="return-btn">
+      <i class="fas fa-arrow-left"></i> Volver
+    </a>
+
+    <div class="header">
+      <h1><i class="fas fa-chart-line"></i> Regresión Polinomial</h1>
+    </div>
+
+    <div class="content-container">
+      <div class="mb-3">
+        <label for="csvInput" class="form-label"
+          ><i class="fas fa-file-csv"></i> Subir archivo CSV:</label
+        >
+        <input type="file" class="form-control" id="csvInput" accept=".csv" />
+      </div>
+
+      <div id="parameters" class="mb-4">
+        <label for="trainTestSplit" class="form-label">
+          <i class="fas fa-percentage"></i> Porcentaje de Train/Test:</label
+        >
+        <input
+          type="number"
+          class="form-control mb-3"
+          id="trainTestSplit"
+          min="1"
+          max="100"
+          value="80"
+        />
+      </div>
+
+      <div class="d-flex justify-content-between">
+        <button id="trainButton" class="btn btn-custom">Entrenar</button>
+        <button id="predictButton" class="btn btn-custom">Predecir</button>
+        <button id="showGraphButton" class="btn btn-custom">
+          Mostrar Gráfica
+        </button>
+      </div>
+      <pre id="log"></pre>
+
+      <div
+        id="graphContainer"
+        class="mt-4"
+        style="width: 900px; height: 500px"
+      ></div>
+    </div>
+
+    <script>
+      google.charts.load("current", { packages: ["corechart"] });
+
+      function joinArrays() {
+        var a = [];
+        if (arguments.length == 10) {
+          a.push([
+            arguments[0],
+            arguments[2],
+            arguments[4],
+            arguments[6],
+            arguments[8],
+          ]);
+          for (var i = 0; i < arguments[1].length; i++) {
+            a.push([
+              arguments[1][i],
+              arguments[3][i],
+              arguments[5][i],
+              arguments[7][i],
+              arguments[9][i],
+            ]);
+          }
+        }
+        return a;
+      }
+
+      let xTrain = [];
+      let yTrain = [];
+      let predictArray = [];
+      let yPredict, yPredict2, yPredict3;
+      let r2, r22, r23;
+
+      // Lee y procesa el archivo CSV
+      document
+        .getElementById("csvInput")
+        .addEventListener("change", function (event) {
+          const file = event.target.files[0];
+          if (!file) return;
+
+          const reader = new FileReader();
+          reader.onload = function (e) {
+            const csvData = e.target.result;
+            const lines = csvData.split("\n");
+
+            // Arrays temporales para X, Y y X_to_predict
+            let csvX = [];
+            let csvY = [];
+            let csvPredict = [];
+
+            for (let i = 1; i < lines.length; i++) {
+              // Saltar encabezado
+              const [x, y, xPredict] = lines[i].split(",").map(Number);
+              if (!isNaN(x) && !isNaN(y) && !isNaN(xPredict)) {
+                csvX.push(x);
+                csvY.push(y);
+                csvPredict.push(xPredict);
+              }
+            }
+
+            if (csvX.length !== csvY.length || csvX.length === 0) {
+              alert("El archivo CSV no es válido o está vacío.");
+              return;
+            }
+
+            // Asignar datos desde CSV a los arrays de entrenamiento y predicción
+            xTrain = csvX;
+            yTrain = csvY;
+            predictArray = csvPredict;
+            alert("Datos cargados exitosamente desde el archivo CSV.");
+          };
+
+          reader.readAsText(file);
+        });
+
+      document
+        .getElementById("trainButton")
+        .addEventListener("click", function () {
+          if (
+            xTrain.length === 0 ||
+            yTrain.length === 0 ||
+            predictArray.length === 0
+          ) {
+            alert("Primero cargue un archivo CSV válido.");
+            return;
+          }
+
+          const trainTestSplit =
+            parseInt(document.getElementById("trainTestSplit").value, 10) / 100;
+          const trainSize = Math.floor(xTrain.length * trainTestSplit);
+
+          const xTrainSubset = xTrain.slice(0, trainSize);
+          const yTrainSubset = yTrain.slice(0, trainSize);
+          const polynomial = new PolynomialRegression();
+
+          // Entrena el modelo para distintos grados
+          polynomial.fit(xTrainSubset, yTrainSubset, 2);
+          yPredict = polynomial.predict(predictArray);
+          r2 = polynomial.getError();
+
+          polynomial.fit(xTrainSubset, yTrainSubset, 3);
+          yPredict2 = polynomial.predict(predictArray);
+          r22 = polynomial.getError();
+
+          polynomial.fit(xTrainSubset, yTrainSubset, 4);
+          yPredict3 = polynomial.predict(predictArray);
+          r23 = polynomial.getError();
+
+          alert("Entrenamiento completado.");
+        });
+
+      document
+        .getElementById("predictButton")
+        .addEventListener("click", function () {
+          if (yPredict && yPredict2 && yPredict3) {
+            document.getElementById("log").innerHTML =
+              "X Train: [" + xTrain + "]\n";
+            document.getElementById("log").innerHTML +=
+              "Y Train: [" + yTrain + "]\n";
+            document.getElementById("log").innerHTML +=
+              "X To Predict: [" + predictArray + "]\n";
+            document.getElementById("log").innerHTML +=
+              "Y Prediction Degree 2: [" + yPredict + "]\n";
+            document.getElementById("log").innerHTML +=
+              "Y Prediction Degree 3: [" + yPredict2 + "]\n";
+            document.getElementById("log").innerHTML +=
+              "Y Prediction Degree 4: [" + yPredict3 + "]\n";
+            document.getElementById("log").innerHTML +=
+              "R^2 for Degree 2: " + r2.toFixed(2) + "\n";
+            document.getElementById("log").innerHTML +=
+              "R^2 for Degree 3: " + r22.toFixed(2) + "\n";
+            document.getElementById("log").innerHTML +=
+              "R^2 for Degree 4: " + r23.toFixed(2);
+          } else {
+            alert("Primero entrena el modelo.");
+          }
+        });
+
+      document
+        .getElementById("showGraphButton")
+        .addEventListener("click", function () {
+          if (yPredict && yPredict2 && yPredict3) {
+            drawChart();
+          } else {
+            alert("Primero entrena el modelo para ver la gráfica.");
+          }
+        });
+
+      function drawChart() {
+        const dataArray = joinArrays(
+          "x",
+          predictArray,
+          "Training",
+          yTrain,
+          "Prediction Degree 2",
+          yPredict,
+          "Prediction Degree 3",
+          yPredict2,
+          "Prediction Degree 4",
+          yPredict3
+        );
+
+        const data = google.visualization.arrayToDataTable(dataArray);
+        const options = {
+          title: "Regresión Polinomial para Distintos Grados",
+          seriesType: "scatter",
+          series: {
+            1: { type: "line" },
+            2: { type: "line" },
+            3: { type: "line" },
+          },
+        };
+
+        const chart = new google.visualization.ComboChart(
+          document.getElementById("graphContainer")
+        );
+        chart.draw(data, options);
+      }
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <footer>
+      <p>
+        &copy; 2024 Christian Alessander Blanco González. Todos los derechos
+        reservados.
+      </p>
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Regresión Lineal</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <script src="../dist/tytus.js"></script>
+    <script
+      type="text/javascript"
+      src="https://www.gstatic.com/charts/loader.js"
+    ></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    />
+    <style>
+      :root {
+        --primary-color: #424654;
+        --secondary-color: #5a5f73;
+        --background-color: #f5f5f7;
+        --card-background: #ffffff;
+        --text-color: #333333;
+        --border-radius: 15px;
+        --box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+      }
+
+      body {
+        background-color: var(--background-color);
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        color: var(--text-color);
+        min-height: 100vh;
+        margin: 0;
+        padding: 0;
+      }
+
+      .header {
+        background: linear-gradient(
+          135deg,
+          var(--primary-color),
+          var(--secondary-color)
+        );
+        color: white;
+        padding: 2rem 0;
+        text-align: center;
+        margin-bottom: 2rem;
+        box-shadow: var(--box-shadow);
+      }
+
+      .header h1 {
+        font-size: 2.5rem;
+        margin: 0;
+        font-weight: 600;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+      }
+
+      .content-container {
+        background-color: var(--card-background);
+        border-radius: var(--border-radius);
+        box-shadow: var(--box-shadow);
+        padding: 2rem;
+        margin: 0 auto 2rem;
+        max-width: 1200px;
+        width: 90%;
+      }
+
+      .card {
+        background: var(--card-background);
+        border-radius: var(--border-radius);
+        border: none;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+        transition: transform 0.3s ease;
+        margin-bottom: 1.5rem;
+      }
+
+      .card:hover {
+        transform: translateY(-5px);
+      }
+
+      .card-header {
+        background: linear-gradient(
+          135deg,
+          var(--primary-color),
+          var(--secondary-color)
+        );
+        color: white;
+        border-radius: var(--border-radius) var(--border-radius) 0 0 !important;
+        padding: 1rem;
+      }
+
+      .form-label {
+        color: var(--primary-color);
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+      }
+
+      .form-control {
+        border-radius: 8px;
+        border: 2px solid #e1e1e1;
+        padding: 0.75rem;
+        transition: all 0.3s ease;
+      }
+
+      .form-control:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 0.2rem rgba(66, 70, 84, 0.25);
+      }
+
+      .btn {
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      }
+
+      .btn-custom {
+        background: linear-gradient(
+          135deg,
+          var(--primary-color),
+          var(--secondary-color)
+        );
+        color: white;
+        border: none;
+      }
+
+      .btn-custom:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        background: linear-gradient(
+          135deg,
+          var(--secondary-color),
+          var(--primary-color)
+        );
+      }
+
+      .btn-custom:disabled {
+        background: #cccccc;
+        cursor: not-allowed;
+      }
+
+      #graphContainer {
+        background-color: white;
+        border-radius: var(--border-radius);
+        padding: 1.5rem;
+        box-shadow: var(--box-shadow);
+        margin: 2rem auto;
+        min-height: 500px;
+      }
+
+      #log,
+      #predecir,
+      #evaluar {
+        background-color: #f8f9fa;
+        padding: 1rem;
+        border-radius: var(--border-radius);
+        font-family: "Consolas", monospace;
+        margin-top: 1.5rem;
+        border: 1px solid #e1e1e1;
+        max-height: 300px;
+        overflow-y: auto;
+        white-space: pre-wrap;
+      }
+
+      .return-btn {
+        position: fixed;
+        top: 1.5rem;
+        left: 1.5rem;
+        background: var(--primary-color);
+        color: white;
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        box-shadow: var(--box-shadow);
+        z-index: 1000;
+      }
+
+      .return-btn:hover {
+        background: var(--secondary-color);
+        color: white;
+        transform: translateY(-2px);
+      }
+
+      .icon-container {
+        display: inline-block;
+        margin-right: 0.5rem;
+      }
+
+      footer {
+        background-color: #424654;
+        color: white;
+        text-align: center;
+        padding: 15px;
+      }
+    </style>
+  </head>
+  <body>
+    <a href="../../index.html" class="return-btn">
+      <i class="fas fa-arrow-left"></i> Volver
+    </a>
+
+    <div class="header">
+      <h1><i class="fas fa-chart-line"></i> Regresión Lineal</h1>
+    </div>
+
+    <div class="content-container">
+      <div class="card mb-4">
+        <div class="card-header">
+          <h5 class="mb-0"><i class="fas fa-upload"></i> Cargar Datos</h5>
+        </div>
+        <div class="card-body">
+          <div class="mb-4">
+            <label for="csvFile" class="form-label">
+              <i class="fas fa-file-csv"></i> Archivo CSV:
+            </label>
+            <input
+              type="file"
+              class="form-control"
+              id="csvFile"
+              accept=".csv"
+            />
+          </div>
+        </div>
+      </div>
+
+      <div class="card mb-4">
+        <div class="card-header">
+          <h5 class="mb-0">
+            <i class="fas fa-sliders-h"></i> Parámetros del Modelo
+          </h5>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-4 mb-3">
+              <label for="trainTestSplit" class="form-label">
+                <i class="fas fa-percentage"></i> Train/Test Split:
+              </label>
+              <input
+                type="number"
+                class="form-control"
+                id="trainTestSplit"
+                min="1"
+                max="100"
+                value="80"
+              />
+            </div>
+            <div class="col-md-4 mb-3">
+              <label for="learningRate" class="form-label">
+                <i class="fas fa-tachometer-alt"></i> Learning Rate:
+              </label>
+              <input
+                type="number"
+                class="form-control"
+                id="learningRate"
+                step="0.01"
+                value="0.01"
+              />
+            </div>
+            <div class="col-md-4 mb-3">
+              <label for="iterations" class="form-label">
+                <i class="fas fa-redo"></i> Iteraciones:
+              </label>
+              <input
+                type="number"
+                class="form-control"
+                id="iterations"
+                value="1000"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card mb-4">
+        <div class="card-header">
+          <h5 class="mb-0"><i class="fas fa-cogs"></i> Acciones</h5>
+        </div>
+        <div class="card-body">
+          <div class="d-flex justify-content-between flex-wrap gap-3">
+            <button id="trainButton" class="btn btn-custom" disabled>
+              <i class="fas fa-brain"></i> Entrenar
+            </button>
+            <button id="predictButton" class="btn btn-custom">
+              <i class="fas fa-magic"></i> Predecir
+            </button>
+            <button id="evaluateButton" class="btn btn-custom">
+              <i class="fas fa-check-circle"></i> Evaluar
+            </button>
+            <button id="showGraphButton" class="btn btn-custom">
+              <i class="fas fa-chart-area"></i> Mostrar Gráfica
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <pre id="log"></pre>
+      <pre id="predecir"></pre>
+      <pre id="evaluar"></pre>
+      <div id="graphContainer"></div>
+    </div>
+    <script>
+      google.charts.load("current", { packages: ["corechart"] });
+
+      let xTrain = [];
+      let yTrain = [];
+      let yPredict = [];
+      let linear = null;
+
+      // Lee y procesa el archivo CSV cargado y entrena el modelo
+      document
+        .getElementById("csvFile")
+        .addEventListener("change", function (event) {
+          const file = event.target.files[0];
+          if (file) {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+              const content = e.target.result;
+              alert("Archivo cargado correctamente.");
+              processCSV(content);
+              // Llama al entrenamiento después de procesar el CSV
+              trainModel();
+            };
+            reader.readAsText(file);
+          }
+        });
+
+      // Procesa el contenido del CSV para obtener xTrain e yTrain
+      function processCSV(data) {
+        const rows = data.split("\n").map((row) => row.split(","));
+        xTrain = [];
+        yTrain = [];
+
+        rows.forEach((row, index) => {
+          if (index > 0 && row.length >= 2) {
+            // Ignorar la cabecera
+            const xValue = parseFloat(row[0]);
+            const yValue = parseFloat(row[1]);
+            if (!isNaN(xValue) && !isNaN(yValue)) {
+              xTrain.push(xValue);
+              yTrain.push(yValue);
+            }
+          }
+        });
+
+        document.getElementById("log").innerHTML =
+          "Datos cargados desde CSV:<br>X: " + xTrain + "<br>Y: " + yTrain;
+      }
+
+      // Entrena el modelo
+      function trainModel() {
+        if (xTrain.length !== yTrain.length) {
+          alert("La cantidad de valores en X debe coincidir con la de Y.");
+          return;
+        }
+
+        const trainTestSplit = parseInt(
+          document.getElementById("trainTestSplit").value
+        );
+        const learningRate = parseFloat(
+          document.getElementById("learningRate").value
+        );
+        const iterations = parseInt(
+          document.getElementById("iterations").value
+        );
+
+        linear = new LinearRegression({
+          learningRate: learningRate,
+          iterations: iterations,
+        });
+
+        const trainSize = Math.floor((trainTestSplit / 100) * xTrain.length);
+        const xTrainSplit = xTrain.slice(0, trainSize);
+        const yTrainSplit = yTrain.slice(0, trainSize);
+
+        linear.fit(xTrainSplit, yTrainSplit);
+        yPredict = linear.predict(xTrain);
+
+        document.getElementById("log").innerHTML +=
+          "<br>Entrenamiento completado.<br>" +
+          "Tasa de Aprendizaje: " +
+          learningRate +
+          "<br>" +
+          "Iteraciones: " +
+          iterations +
+          "<br>" +
+          "X Train: " +
+          xTrain +
+          "<br>" +
+          "Y Train: " +
+          yTrain;
+      }
+
+      document
+        .getElementById("predictButton")
+        .addEventListener("click", function () {
+          if (yPredict.length > 0) {
+            document.getElementById("predecir").innerHTML +=
+              "<br>Predicciones: " + yPredict;
+          } else {
+            alert("Primero entrena el modelo.");
+          }
+        });
+
+      document
+        .getElementById("showGraphButton")
+        .addEventListener("click", function () {
+          if (yPredict.length > 0) {
+            drawChart();
+          } else {
+            alert("Primero entrena el modelo para ver la gráfica.");
+          }
+        });
+
+      document
+        .getElementById("evaluateButton")
+        .addEventListener("click", function () {
+          if (yPredict.length > 0 && linear) {
+            const mse = linear.mserror(yTrain, yPredict);
+            const r2 = linear.coeficientR2(yTrain, yPredict);
+            document.getElementById("evaluar").innerHTML +=
+              "<br>Error Cuadrático Medio (MSE): " +
+              mse +
+              "<br>Coeficiente de Determinación (R²): " +
+              r2;
+          } else {
+            alert(
+              "Primero entrena y realiza predicciones para evaluar el modelo."
+            );
+          }
+        });
+
+      function drawChart() {
+        const dataArray = [["X", "Y Train", "Y Predict"]];
+        for (let i = 0; i < xTrain.length; i++) {
+          dataArray.push([xTrain[i], yTrain[i], yPredict[i]]);
+        }
+
+        const data = google.visualization.arrayToDataTable(dataArray);
+        const options = {
+          title: "Regresión Lineal",
+          hAxis: { title: "X" },
+          vAxis: { title: "Y" },
+          seriesType: "scatter",
+          series: { 1: { type: "line" } },
+        };
+
+        const chart = new google.visualization.ComboChart(
+          document.getElementById("graphContainer")
+        );
+        chart.draw(data, options);
+      }
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <footer>
+      <p>
+        &copy; 2024 Christian Alessander Blanco González. Todos los derechos
+        reservados.
+      </p>
+    </footer>
+  </body>
+</html>

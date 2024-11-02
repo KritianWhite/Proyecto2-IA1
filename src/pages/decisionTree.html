@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ID3 Decision Tree</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    />
+    <style>
+      :root {
+        --primary-color: #424654;
+        --secondary-color: #5a5f73;
+        --background-color: #f5f5f7;
+        --card-background: #ffffff;
+        --text-color: #333333;
+        --border-radius: 15px;
+        --box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+      }
+
+      body {
+        background-color: var(--background-color);
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        color: var(--text-color);
+        min-height: 100vh;
+        margin: 0;
+        padding: 0;
+      }
+
+      .header {
+        background: linear-gradient(
+          135deg,
+          var(--primary-color),
+          var(--secondary-color)
+        );
+        color: white;
+        padding: 2rem 0;
+        text-align: center;
+        margin-bottom: 2rem;
+        box-shadow: var(--box-shadow);
+      }
+
+      .header h1 {
+        font-size: 2.5rem;
+        margin: 0;
+        font-weight: 600;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+      }
+
+      .content-container {
+        background-color: var(--card-background);
+        border-radius: var(--border-radius);
+        box-shadow: var(--box-shadow);
+        padding: 2rem;
+        margin: 0 auto 2rem;
+        max-width: 1200px;
+        width: 90%;
+      }
+
+      .form-label {
+        color: var(--primary-color);
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+      }
+
+      .form-control {
+        border-radius: 8px;
+        border: 2px solid #e1e1e1;
+        padding: 0.75rem;
+        transition: all 0.3s ease;
+      }
+
+      .form-control:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 0.2rem rgba(66, 70, 84, 0.25);
+      }
+
+      .btn {
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      }
+
+      .btn-custom {
+        background: linear-gradient(
+          135deg,
+          var(--primary-color),
+          var(--secondary-color)
+        );
+        color: white;
+        border: none;
+      }
+
+      .btn-custom:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        background: linear-gradient(
+          135deg,
+          var(--secondary-color),
+          var(--primary-color)
+        );
+      }
+
+      .btn-custom:disabled {
+        background: #cccccc;
+        cursor: not-allowed;
+      }
+
+      .return-btn {
+        position: fixed;
+        top: 1.5rem;
+        left: 1.5rem;
+        background: var(--primary-color);
+        color: white;
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        box-shadow: var(--box-shadow);
+        z-index: 1000;
+      }
+
+      .return-btn:hover {
+        background: var(--secondary-color);
+        color: white;
+        transform: translateY(-2px);
+      }
+
+      #prediction {
+        background-color: #f8f9fa;
+        padding: 1rem;
+        border-radius: var(--border-radius);
+        font-family: "Consolas", monospace;
+        margin-top: 1.5rem;
+        border: 1px solid #e1e1e1;
+        max-height: 300px;
+        overflow-y: auto;
+        white-space: pre-wrap;
+      }
+
+      #tree {
+        background-color: white;
+        border-radius: var(--border-radius);
+        box-shadow: var(--box-shadow);
+        padding: 1.5rem;
+      }
+
+      footer {
+        background-color: #424654;
+        color: white;
+        text-align: center;
+        padding: 15px;
+      }
+    </style>
+    <script
+      type="text/javascript"
+      src="https://cdnjs.cloudflare.com/ajax/libs/vis/4.21.0/vis-network.min.js"
+    ></script>
+    <script src="../dist/tytus.js"></script>
+  </head>
+  <body>
+    <a href="../../index.html" class="return-btn">
+      <i class="fas fa-arrow-left"></i> Volver
+    </a>
+
+    <div class="header">
+      <h1><i class="fas fa-tree"></i> Árbol de Decisión - Algoritmo ID3</h1>
+    </div>
+
+    <div class="content-container">
+      <p>
+        <strong>Cargar archivo JSON:</strong>
+      </p>
+
+      <div class="mb-3 text-center">
+        <input type="file" id="jsonFile" accept=".json" class="form-control" />
+      </div>
+
+      <div class="my-4">
+        <p>
+          <strong>Cargar archivo JSON:</strong>
+        </p>
+        <input
+          type="text"
+          class="form-control"
+          id="data"
+          placeholder="Ejemplo: Overcast, Cool, Normal, Strong"
+        />
+      </div>
+
+      <div class="card-body">
+        <div class="d-flex justify-content-between flex-wrap gap-3">
+          <button id="loadJson" class="btn btn-custom mt-2">Entrenar</button>
+          <button id="predict" class="btn btn-custom">Predecir</button>
+        </div>
+      </div>
+
+      <pre id="prediction" class="mt-4 text-center fs-5"></pre>
+
+      <h3 class="text-center mt-5">Árbol Resultante:</h3>
+      <div class="container mb-5">
+        <div id="tree" style="width: 100%; height: 500px"></div>
+      </div>
+    </div>
+    <script type="text/javascript">
+      let header = [];
+      let trainingData = [];
+      let dTree = null;
+      let root = null;
+
+      // Cargar datos desde archivo JSON y generar el árbol de decisión
+      document.getElementById("loadJson").onclick = function () {
+        const fileInput = document.getElementById("jsonFile");
+        const file = fileInput.files[0];
+
+        if (file) {
+          const reader = new FileReader();
+
+          reader.onload = function (e) {
+            const jsonData = JSON.parse(e.target.result);
+
+            // Asignar encabezado y datos de entrenamiento
+            header = jsonData.header;
+            trainingData = jsonData.training_data;
+
+            console.log("Datos JSON cargados:");
+            console.log("Encabezado:", header);
+            console.log("Datos de entrenamiento:", trainingData);
+
+            // Generar el árbol con los datos de entrenamiento
+            alert(
+              "Datos cargados correctamente. Generando árbol de decisión..."
+            );
+            generateTree();
+          };
+
+          reader.readAsText(file);
+        } else {
+          alert("Por favor, selecciona un archivo JSON.");
+        }
+      };
+
+      function generateTree() {
+        var chart = document.getElementById("tree");
+        var arrData = [header].concat(trainingData);
+        dTree = new DecisionTreeID3(arrData);
+        root = dTree.train(dTree.dataset);
+
+        console.log("Árbol de decisión generado.");
+
+        // Generar y mostrar el gráfico del árbol
+        var dotStr = dTree.generateDotString(root);
+        var parsDot = vis.network.convertDot(dotStr);
+        var data = { nodes: parsDot.nodes, edges: parsDot.edges };
+        var options = {
+          layout: {
+            hierarchical: {
+              levelSeparation: 100,
+              nodeSpacing: 100,
+              parentCentralization: true,
+              direction: "UD",
+              sortMethod: "directed",
+            },
+          },
+        };
+        var network = new vis.Network(chart, data, options);
+      }
+
+      // Realizar la predicción cuando el usuario ingrese los datos y haga clic en "Predecir"
+      document.getElementById("predict").onclick = function () {
+        if (!root || !dTree) {
+          alert(
+            "Por favor, carga los datos desde JSON y genera el árbol antes de intentar predecir."
+          );
+          return;
+        }
+
+        var pred = document.getElementById("data").value;
+        var arrPred = pred.split(",").map((item) => item.trim());
+
+        console.log("Datos de predicción ingresados:", arrPred);
+
+        var predHeader = header.slice(0, header.length - 1);
+        let predictNode = dTree.predict([predHeader, arrPred], root);
+
+        if (predictNode) {
+          document.getElementById("prediction").innerText =
+            header[header.length - 1] + ": " + predictNode.value;
+          console.log("Predicción realizada:", predictNode.value);
+        } else {
+          document.getElementById("prediction").innerText =
+            "Datos faltantes para la generación de la predicción.";
+          console.error(
+            "No se pudo generar la predición. Verifica los datos de entrada."
+          );
+        }
+      };
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <footer>
+      <p>
+        &copy; 2024 Christian Alessander Blanco González. Todos los derechos
+        reservados.
+      </p>
+    </footer>
+  </body>
+</html>

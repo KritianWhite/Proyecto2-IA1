@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>KMeans Clustering</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    />
+    <style>
+      :root {
+        --primary-color: #424654;
+        --secondary-color: #5a5f73;
+        --background-color: #f5f5f7;
+        --card-background: #ffffff;
+        --text-color: #333333;
+        --border-radius: 15px;
+        --box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+      }
+
+      body {
+        background-color: var(--background-color);
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        color: var(--text-color);
+        min-height: 100vh;
+        margin: 0;
+        padding: 0;
+      }
+
+      .header {
+        background: linear-gradient(
+          135deg,
+          var(--primary-color),
+          var(--secondary-color)
+        );
+        color: white;
+        padding: 2rem 0;
+        text-align: center;
+        margin-bottom: 2rem;
+        box-shadow: var(--box-shadow);
+      }
+
+      .header h1 {
+        font-size: 2.5rem;
+        margin: 0;
+        font-weight: 600;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+      }
+
+      .content-container {
+        background-color: var(--card-background);
+        border-radius: var(--border-radius);
+        box-shadow: var(--box-shadow);
+        padding: 2rem;
+        margin: 0 auto 2rem;
+        max-width: 1200px;
+        width: 90%;
+      }
+
+      .form-label {
+        color: var(--primary-color);
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+      }
+
+      .form-control {
+        border-radius: 8px;
+        border: 2px solid #e1e1e1;
+        padding: 0.75rem;
+        transition: all 0.3s ease;
+      }
+
+      .form-control:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 0.2rem rgba(66, 70, 84, 0.25);
+      }
+
+      .btn {
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      }
+
+      .btn-custom {
+        background: linear-gradient(
+          135deg,
+          var(--primary-color),
+          var(--secondary-color)
+        );
+        color: white;
+        border: none;
+      }
+
+      .btn-custom:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        background: linear-gradient(
+          135deg,
+          var(--secondary-color),
+          var(--primary-color)
+        );
+      }
+
+      .btn-custom:disabled {
+        background: #cccccc;
+        cursor: not-allowed;
+      }
+
+      .return-btn {
+        position: fixed;
+        top: 1.5rem;
+        left: 1.5rem;
+        background: var(--primary-color);
+        color: white;
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        box-shadow: var(--box-shadow);
+        z-index: 1000;
+      }
+
+      .return-btn:hover {
+        background: var(--secondary-color);
+        color: white;
+        transform: translateY(-2px);
+      }
+
+      #chart_div {
+        background-color: white;
+        border-radius: var(--border-radius);
+        box-shadow: var(--box-shadow);
+        padding: 1.5rem;
+      }
+
+      footer {
+        background-color: #424654;
+        color: white;
+        text-align: center;
+        padding: 15px;
+      }
+    </style>
+    <script src="../dist/tytus.js"></script>
+    <script
+      type="text/javascript"
+      src="https://www.gstatic.com/charts/loader.js"
+    ></script>
+  </head>
+  <body>
+    <a href="../../index.html" class="return-btn">
+      <i class="fas fa-arrow-left"></i> Volver
+    </a>
+
+    <div class="header">
+      <h1><i class="fas fa-chart-pie"></i> KMeans Clustering</h1>
+    </div>
+
+    <div class="content-container">
+      <div class="mb-3">
+        <label for="type_select" class="form-label">
+          Seleccione el tipo de datos:
+        </label>
+        <select class="form-select" id="type_select">
+          <option value="lineal">Lineal</option>
+          <option value="2d">2 Dimensiones</option>
+        </select>
+      </div>
+
+      <div class="mb-3">
+        <label for="cluster_count" class="form-label"
+          >Cantidad de Clusters</label
+        >
+        <input
+          type="number"
+          class="form-control"
+          id="cluster_count"
+          placeholder="Ingrese la cantidad de clusters"
+          value="3"
+        />
+      </div>
+
+      <div class="mb-3">
+        <label for="data_file" class="form-label"
+          >Cargar Archivo de Datos (CSV)</label
+        >
+        <input type="file" class="form-control" id="data_file" accept=".csv" />
+        <button id="entrenarBoton" class="btn btn-custom mt-2">Entrenar</button>
+      </div>
+
+      <div class="mb-3">
+        <label for="iterations" class="form-label"
+          >Cantidad de Iteraciones</label
+        >
+        <input
+          type="number"
+          class="form-control"
+          id="iterations"
+          placeholder="Ingrese la cantidad de iteraciones"
+          value="3"
+        />
+      </div>
+
+      <div class="d-flex justify-content-center mb-4">
+        <button id="calculate_button" class="btn btn-custom">Predecir</button>
+      </div>
+
+      <h3 class="text-center mt-5">Grafico de KMeans:</h3>
+      <div
+        id="chart_div"
+        class="container mt-4"
+        style="width: 900px; height: 500px"
+      ></div>
+    </div>
+    <script>
+      document.getElementById("calculate_button").onclick = function () {
+        const type = document.getElementById("type_select").value;
+        const clusterCount = parseInt(
+          document.getElementById("cluster_count").value
+        );
+        const iterations = parseInt(
+          document.getElementById("iterations").value
+        );
+        const fileInput = document.getElementById("data_file");
+
+        if (!fileInput.files.length) {
+          alert("Por favor, seleccione un archivo CSV.");
+          return;
+        }
+
+        const file = fileInput.files[0];
+        const reader = new FileReader();
+        reader.onload = function (event) {
+          const csvData = event.target.result;
+          const parsedData = parseCSV(csvData, type);
+
+          if (parsedData.length < clusterCount) {
+            alert(
+              `El número de clusters (${clusterCount}) no puede ser mayor que la cantidad de datos (${parsedData.length})`
+            );
+            return;
+          }
+
+          if (type === "lineal") {
+            calculateLinealKMeans(clusterCount, iterations, parsedData);
+          } else {
+            calculate2DKMeans(clusterCount, iterations, parsedData);
+          }
+
+          alert("KMeans calculado correctamente.");
+        };
+        reader.readAsText(file);
+      };
+
+      function parseCSV(data, type) {
+        const rows = data.trim().split("\n");
+        if (type === "lineal") {
+          return rows.slice(1).map((row) => parseFloat(row));
+        } else {
+          return rows.slice(1).map((row) => {
+            const [x, y] = row.split(",").map(Number);
+            return [x, y];
+          });
+        }
+      }
+
+      function calculateLinealKMeans(clusterCount, iterations, data) {
+        const kmeans = new LinearKMeans(clusterCount, data);
+        const clusterizedData = kmeans.clusterize(
+          clusterCount,
+          data,
+          iterations
+        );
+
+        const clusters = Array.from(
+          new Set(clusterizedData.map((a) => a[1]))
+        ).map((cluster) => [cluster, getRandomColor()]);
+        google.charts.load("current", { packages: ["corechart"] });
+        google.charts.setOnLoadCallback(() =>
+          drawChartLineal(clusterizedData, clusters)
+        );
+      }
+
+      function calculate2DKMeans(clusterCount, iterations, data) {
+        const kmeans = new _2DKMeans(clusterCount, data);
+        const clusterizedData = kmeans.clusterize(
+          clusterCount,
+          data,
+          iterations
+        );
+
+        const clusters = Array.from(
+          new Set(clusterizedData.map((a) => JSON.stringify(a[1])))
+        ).map((cluster) => [JSON.parse(cluster), getRandomColor()]);
+        google.charts.load("current", { packages: ["corechart"] });
+        google.charts.setOnLoadCallback(() =>
+          drawChart2D(clusterizedData, clusters)
+        );
+      }
+
+      function drawChartLineal(clusterizedData, clusters) {
+        const graphData = new google.visualization.DataTable();
+        graphData.addColumn("number", "X");
+        graphData.addColumn("number", "Y");
+        graphData.addColumn({ type: "string", role: "style" });
+
+        clusterizedData.forEach((e) => {
+          graphData.addRow([
+            e[0],
+            0,
+            `point { size: 7; shape-type: diamond; fill-color: ${
+              clusters.find((c) => c[0] === e[1])[1]
+            }`,
+          ]);
+        });
+
+        clusters.forEach((c) => {
+          graphData.addRow([
+            c[0],
+            0,
+            `point { size: 10; shape-type: square; fill-color: #FF0000`,
+          ]);
+        });
+
+        const options = {
+          title: "Distribución Lineal de Clusters",
+          seriesType: "scatter",
+          hAxis: { title: "X" },
+          vAxis: { title: "Y" },
+          legend: "none",
+        };
+
+        const chart = new google.visualization.ScatterChart(
+          document.getElementById("chart_div")
+        );
+        chart.draw(graphData, options);
+      }
+
+      function drawChart2D(clusterizedData, clusters) {
+        const graphData = new google.visualization.DataTable();
+        graphData.addColumn("number", "X");
+        graphData.addColumn("number", "Y");
+        graphData.addColumn({ type: "string", role: "style" });
+
+        clusterizedData.forEach((e) => {
+          graphData.addRow([
+            e[0][0],
+            e[0][1],
+            `point { size: 7; shape-type: diamond; fill-color: ${
+              clusters.find(
+                (c) => JSON.stringify(c[0]) === JSON.stringify(e[1])
+              )[1]
+            }`,
+          ]);
+        });
+
+        clusters.forEach((c) => {
+          graphData.addRow([
+            c[0][0],
+            c[0][1],
+            `point { size: 10; shape-type: square; fill-color: #FF0000`,
+          ]);
+        });
+
+        const options = {
+          title: "Distribución de Clusters en 2D",
+          seriesType: "scatter",
+          hAxis: { title: "X" },
+          vAxis: { title: "Y" },
+          legend: "none",
+        };
+
+        const chart = new google.visualization.ScatterChart(
+          document.getElementById("chart_div")
+        );
+        chart.draw(graphData, options);
+      }
+
+      function getRandomColor() {
+        return "#" + Math.floor(Math.random() * 16777215).toString(16);
+      }
+
+      document.getElementById("entrenarBoton").onclick = function () {
+        alert("Modelo entrenado");
+      };
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <footer>
+      <p>
+        &copy; 2024 Christian Alessander Blanco González. Todos los derechos
+        reservados.
+      </p>
+    </footer>
+  </body>
+</html>
